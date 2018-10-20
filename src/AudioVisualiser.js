@@ -1,13 +1,10 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 
 class AudioVisualiser extends Component {
   constructor(props) {
     super(props);
     this.canvas = React.createRef();
-  }
-
-  componentDidUpdate() {
-    this.draw();
+    this.draw = this.draw.bind(this);
   }
 
   draw() {
@@ -25,17 +22,23 @@ class AudioVisualiser extends Component {
 
     context.beginPath();
     context.moveTo(0, height / 2);
+
     for (const item of audioData) {
       const y = (item / 255.0) * height;
       context.lineTo(x, y);
       x += sliceWidth;
     }
+
     context.lineTo(x, height / 2);
     context.stroke();
   }
 
+  componentDidUpdate() {
+    this.draw();
+  }
+
   render() {
-    return <canvas width="300" height="300" ref={this.canvas} />;
+    return <canvas width="300" height="300" ref={this.canvas}/>;
   }
 }
 

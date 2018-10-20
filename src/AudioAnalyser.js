@@ -1,26 +1,25 @@
 import React, { Component } from 'react';
-import AudioVisualiser from './AudioVisualiser';
+import AudioVisualiser from './AudioVisualiser.js';
 
 class AudioAnalyser extends Component {
   constructor(props) {
     super(props);
     this.state = { audioData: new Uint8Array(0) };
     this.tick = this.tick.bind(this);
+    this.audioContext = null;
+    this.analyser = null;
+    this.dataArray = null;
+    this.source = null;
+    this.rafId = null;
   }
 
   componentDidMount() {
     this.audioContext = new (window.AudioContext ||
-      window.webkitAudioContext)();
+        window.webkitAudioContext)();
     this.analyser = this.audioContext.createAnalyser();
     this.dataArray = new Uint8Array(this.analyser.frequencyBinCount);
     this.source = this.audioContext.createMediaStreamSource(this.props.audio);
     this.source.connect(this.analyser);
-    this.rafId = requestAnimationFrame(this.tick);
-  }
-
-  tick() {
-    this.analyser.getByteTimeDomainData(this.dataArray);
-    this.setState({ audioData: this.dataArray });
     this.rafId = requestAnimationFrame(this.tick);
   }
 
@@ -30,7 +29,14 @@ class AudioAnalyser extends Component {
     this.source.disconnect();
   }
 
+  tick() {
+    this.analyser.getByteTimeDomainData(this.dataArray);
+    this.setState({ audioData: this.dataArray });
+    this.rafId = requestAnimationFrame(this.tick);
+  }
+
   render() {
+    // return <textarea value={this.state.audioData} />;
     return <AudioVisualiser audioData={this.state.audioData} />;
   }
 }
